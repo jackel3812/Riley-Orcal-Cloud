@@ -1,6 +1,6 @@
 [client]
-host=143.47.108.112
+host=db-system.subnet-vbs-executor-vcn.vcn-vbs-executor-vcn.oraclevcn.com
 port=3306
-user=opc
+user=andrewtoka
 ssl-key="C:\\Users\\User\\.ssh\\oracle_cloud\\oracle_cloud_key"
 ssl-cert="C:\\Users\\User\\.ssh\\oracle_cloud\\oracle_cloud_key.pub"

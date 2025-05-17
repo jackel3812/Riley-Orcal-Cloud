@@ -14,7 +14,7 @@ function Write-ColorOutput($ForegroundColor) {
 $sshKeyPath = "$env:USERPROFILE\.ssh\oracle_cloud\oracle_cloud_key"
 $sshKeyPubPath = "$env:USERPROFILE\.ssh\oracle_cloud\oracle_cloud_key.pub"
 $remoteHost = "143.47.108.112"
-$remoteUser = "andrewtoka"
+$remoteUser = "opc"
 $localPort = "9001"
 $remotePort = "3306"
 
