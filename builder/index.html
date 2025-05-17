@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riley Builder</title>
+    
+    <!-- Oracle JET CSS -->
+    <link rel="stylesheet" href="https://static.oracle.com/cdn/jet/15.1.0/default/css/redwood/oj-redwood-min.css">
+    
+    <style>
+        .builder-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .builder-header {
+            padding: 0.5rem 1rem;
+            background: var(--oj-core-bg-color-header);
+            border-bottom: 1px solid var(--oj-border-color);
+        }
+
+        .builder-main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .builder-nav {
+            width: 250px;
+            border-right: 1px solid var(--oj-border-color);
+            background: var(--oj-core-bg-color-content);
+            overflow-y: auto;
+        }
+
+        .builder-workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--oj-core-bg-color-content);
+        }
+
+        .builder-toolbar {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--oj-border-color);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .builder-canvas {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: var(--oj-core-bg-color-workspace);
+        }
+
+        .builder-properties {
+            width: 300px;
+            border-left: 1px solid var(--oj-border-color);
+            background: var(--oj-core-bg-color-content);
+            overflow-y: auto;
+        }
+
+        .diagram-node {
+            padding: 1rem;
+            border: 1px solid var(--oj-border-color);
+            border-radius: 4px;
+            margin: 0.5rem;
+            background: white;
+            cursor: move;
+        }
+    </style>
+</head>
+<body>
+    <div class="builder-container">
+        <header class="builder-header">
+            <oj-navigation-bar>
+                <h1 slot="start">Riley Builder</h1>
+                <oj-toolbar slot="end">
+                    <oj-button display="icons">
+                        <span slot="startIcon" class="oj-ux-ico-save"></span>
+                        Save
+                    </oj-button>
+                    <oj-button display="icons">
+                        <span slot="startIcon" class="oj-ux-ico-settings"></span>
+                        Settings
+                    </oj-button>
+                </oj-toolbar>
+            </oj-navigation-bar>
+        </header>
+
+        <main class="builder-main">
+            <!-- Navigation Tree -->
+            <nav class="builder-nav">
+                <oj-tree-view id="navTree">
+                    <template slot="itemTemplate">
+                        <span><oj-bind-text value="[[item.data.name]]"></oj-bind-text></span>
+                    </template>
+                </oj-tree-view>
+            </nav>
+
+            <!-- Main Workspace -->
+            <div class="builder-workspace">
+                <!-- Toolbar -->
+                <div class="builder-toolbar">
+                    <oj-button-set chroming="solid">
+                        <oj-button>
+                            <span slot="startIcon" class="oj-ux-ico-arrow-left"></span>
+                            Back
+                        </oj-button>
+                        <oj-button>
+                            <span slot="startIcon" class="oj-ux-ico-arrow-right"></span>
+                            Forward
+                        </oj-button>
+                    </oj-button-set>
+                    
+                    <oj-button-set chroming="solid">
+                        <oj-button>
+                            <span slot="startIcon" class="oj-ux-ico-zoom-in"></span>
+                        </oj-button>
+                        <oj-button>
+                            <span slot="startIcon" class="oj-ux-ico-zoom-out"></span>
+                        </oj-button>
+                    </oj-button-set>
+                </div>
+
+                <!-- Canvas -->
+                <div class="builder-canvas" id="diagramCanvas">
+                    <!-- Diagram nodes will be added here -->
+                </div>
+            </div>
+
+            <!-- Properties Panel -->
+            <aside class="builder-properties">
+                <oj-form-layout id="propertyForm">
+                    <!-- Property fields will be added dynamically -->
+                </oj-form-layout>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Oracle JET Scripts -->
+    <script src="https://static.oracle.com/cdn/jet/15.1.0/default/js/libs/require/require.js"></script>
+    <script>
+        requirejs.config({
+            baseUrl: '.',
+            paths: {
+                'knockout': 'https://static.oracle.com/cdn/jet/15.1.0/default/js/libs/knockout/knockout-3.5.1',
+                'jquery': 'https://static.oracle.com/cdn/jet/15.1.0/default/js/libs/jquery/jquery-3.6.0.min',
+                'ojs': 'https://static.oracle.com/cdn/jet/15.1.0/default/js/libs/oj/15.1.0/min',
+                'builder': './js'
+            }
+        });
+
+        require(['ojs/ojcore', 'knockout', 'ojs/ojknockout', 'ojs/ojnavigationbar', 
+                'ojs/ojbutton', 'ojs/ojtoolbar', 'ojs/ojformlayout', 'ojs/ojtreeview',
+                'builder/builder-core'],
+        function(oj, ko) {
+            function BuilderViewModel() {
+                var self = this;
+                
+                // Initialize tree data
+                self.treeData = new oj.ArrayTreeDataProvider([], {
+                    keyAttributes: 'id'
+                });
+
+                // Initialize diagram data
+                self.diagramNodes = ko.observableArray([]);
+                self.selectedNode = ko.observable(null);
+
+                // Apply bindings
+                ko.applyBindings(self);
+            }
+
+            // Start the builder
+            new BuilderViewModel();
+        });
+    </script>
+</body>
+</html>

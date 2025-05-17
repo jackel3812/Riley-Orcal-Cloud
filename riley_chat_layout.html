@@ -1,0 +1,80 @@
+<oj-flex class="riley-chat-container">
+    <!-- Sidebar for settings/nav -->
+    <oj-flex-item class="oj-sm-12 oj-md-3">
+        <div class="riley-sidebar">
+            <h2>Riley AI</h2>
+            <oj-navigation-list>
+                <oj-option value="chat" label="Chat"></oj-option>
+                <oj-option value="settings" label="Settings"></oj-option>
+                <oj-option value="history" label="History"></oj-option>
+            </oj-navigation-list>
+        </div>
+    </oj-flex-item>
+
+    <!-- Main chat area -->
+    <oj-flex-item class="oj-sm-12 oj-md-9">
+        <div class="riley-chat-main">
+            <!-- Chat messages container -->
+            <div class="riley-messages">
+                <oj-oda-chat id="rileyChat"
+                    on-message-sent="[[handleMessageSent]]"
+                    on-voice-recording="[[handleVoiceRecording]]"
+                    enable-voice="true"
+                    enable-attachments="true"
+                    show-timestamp="true"
+                    placeholder-text="Chat with Riley...">
+                </oj-oda-chat>
+            </div>
+            
+            <!-- Voice controls -->
+            <div class="riley-voice-controls">
+                <oj-button on-oj-action="[[startVoiceInput]]">
+                    <span slot="startIcon" class="oj-ux-ico-mic"></span>
+                    Voice Command
+                </oj-button>
+            </div>
+        </div>
+    </oj-flex-item>
+</oj-flex>
+
+<!-- Add responsive styles -->
+<style>
+.riley-chat-container {
+    height: 100vh;
+    background: var(--oj-core-bg-color-content);
+}
+
+.riley-sidebar {
+    padding: 1rem;
+    background: var(--oj-core-bg-color-active);
+    height: 100%;
+}
+
+.riley-chat-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1rem;
+}
+
+.riley-messages {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.riley-voice-controls {
+    padding: 1rem 0;
+    border-top: 1px solid var(--oj-border-color);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .riley-sidebar {
+        display: none;
+    }
+    
+    .riley-chat-main {
+        padding: 0.5rem;
+    }
+}
+</style>

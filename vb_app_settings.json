@@ -1,0 +1,107 @@
+{
+    "application": {
+        "name": "Riley AI Assistant",
+        "version": "1.0.0",
+        "description": "Responsive web interface for Riley AI agent"
+    },
+    "settings": {
+        "theme": {
+            "default": "Redwood",
+            "customColors": {
+                "primary": "#4a90e2",
+                "secondary": "#2c3e50",
+                "accent": "#e74c3c"
+            }
+        },
+        "pwa": {
+            "enabled": true,
+            "manifest": {
+                "name": "Riley AI",
+                "short_name": "Riley",
+                "start_url": "/",
+                "display": "standalone",
+                "background_color": "#ffffff",
+                "theme_color": "#4a90e2",
+                "icons": [
+                    {
+                        "src": "icons/riley-192.png",
+                        "sizes": "192x192",
+                        "type": "image/png"
+                    },
+                    {
+                        "src": "icons/riley-512.png",
+                        "sizes": "512x512",
+                        "type": "image/png"
+                    }
+                ]
+            },
+            "offline": {
+                "enabled": true,
+                "cacheStrategy": "network-first",
+                "fallbackPage": "/offline.html"
+            }
+        },
+        "security": {
+            "authentication": {
+                "required": true,
+                "type": "oauth2",
+                "provider": "oracle"
+            },
+            "api": {
+                "cors": {
+                    "enabled": true,
+                    "origins": ["*"]
+                },
+                "rateLimit": {
+                    "enabled": true,
+                    "maxRequests": 100,
+                    "windowMs": 900000
+                }
+            }
+        },
+        "performance": {
+            "caching": {
+                "enabled": true,
+                "duration": 3600
+            },
+            "compression": true,
+            "lazyLoading": true
+        }
+    },
+    "pages": {
+        "chat": {
+            "route": "/",
+            "title": "Chat with Riley",
+            "components": [
+                "oj-oda-chat",
+                "oj-button",
+                "oj-navigation-list"
+            ]
+        },
+        "settings": {
+            "route": "/settings",
+            "title": "Riley Settings",
+            "components": [
+                "oj-form-layout",
+                "oj-switch",
+                "oj-select-single"
+            ]
+        },
+        "history": {
+            "route": "/history",
+            "title": "Chat History",
+            "components": [
+                "oj-list-view",
+                "oj-paginator"
+            ]
+        }
+    },
+    "api": {
+        "endpoints": {
+            "chat": "/api/chat",
+            "voice": "/api/voice",
+            "history": "/api/history",
+            "settings": "/api/settings"
+        }
+    }
+}

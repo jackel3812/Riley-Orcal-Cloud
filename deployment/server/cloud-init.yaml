@@ -1,0 +1,44 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - python3-pip
+  - python3-dev
+  - nginx
+  - git
+  - supervisor
+
+write_files:
+  - path: /etc/supervisor/conf.d/riley.conf
+    content: |
+      [program:riley]
+      directory=/opt/riley
+      command=python3 riley_api.py
+      autostart=true
+      autorestart=true
+      stderr_logfile=/var/log/riley.err.log
+      stdout_logfile=/var/log/riley.out.log
+      environment=PYTHONUNBUFFERED=1
+
+  - path: /etc/nginx/sites-available/riley
+    content: |
+      server {
+          listen 80;
+          server_name _;
+
+          location / {
+              proxy_pass http://localhost:5000;
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+          }
+      }
+
+runcmd:
+  - cd /opt
+  - git clone https://github.com/yourusername/riley.git
+  - cd riley
+  - pip3 install -r requirements.txt
+  - ln -s /etc/nginx/sites-available/riley /etc/nginx/sites-enabled/
+  - systemctl restart nginx
+  - systemctl restart supervisor

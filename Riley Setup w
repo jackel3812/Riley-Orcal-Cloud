@@ -1,0 +1,82 @@
+Got it — I'll compile a detailed guide for setting up a responsive web application in Oracle Visual Builder specifically for Riley, your intelligent agent. This will include steps to:
+
+* Create the visual application
+* Design responsive pages for desktop and mobile
+* Connect to Riley’s backend (e.g. Flask, FastAPI, OpenAI API)
+* Set up service connections and business objects if needed
+* Add UI components for chat or control interfaces
+* Enable PWA support
+* Preview, test, and publish the application
+
+I’ll let you know once everything is ready for your review.
+
+
+# Building the Riley AI Web Frontend in Oracle Visual Builder
+
+This guide walks through creating a responsive, cross-platform web app in Oracle Visual Builder (VB) to serve as the user interface for the Riley AI agent. The app will include chat and voice components, connect to Riley’s Flask/OpenAI APIs via REST service connections, optionally use Business Objects for data storage, and enable PWA features. We also cover staging, testing, and publishing, with tips on performance and UX. Citations point to Oracle docs and best practices.
+
+## 1. Create the Visual Application and Web App
+
+* **Log in to VB and create a Visual Application:** In the Visual Builder **Home** page, create a new *Visual Application* (if not already available). A Visual Application is a container for one or more web (or mobile) apps.
+* **Add a new Web Application:** In the Navigator pane, select **Web Applications** and click **+ Web Application** (or the “Create Web Application” icon). Give it a name (lowercase letters) and choose a navigation style: *None*, *Navigation Drawer*, or *Bottom Tabs*. These templates are responsive by design; for example, “Bottom Tabs” creates a footer tab bar that adapts to portrait/landscape orientation. Click **Create** to generate the app, which opens the default start page.
+* **Choose a responsive template:** If available (VB 22.04+), select a responsive web app template. Oracle notes that “Responsive web app templates (starting with version 22.04) are… visually appealing and can adjust to the size of the user’s screen, ranging from small phones to wide-screen desktops”. The app will then use Oracle’s Redwood theme by default. You can customize look-and-feel later via **Theme Editor** or CSS.
+
+## 2. Design the Responsive UI
+
+* **Plan your layout with Flex/Grid:** Open the Page Designer and use **oj-flex** containers or **oj-responsive-** CSS classes to lay out components. For example, use `<oj-flex>` as a parent with `<oj-flex-item>` children, and apply responsive classes like `oj-col-sm-12 oj-col-md-6` on items so they span full width on phones and split columns on tablets/desktops. This ensures the interface reflows for different screen sizes.
+* **Set up navigation (if used):** If you chose *Navigation Drawer*, add menu items in Settings under **Navigation Items**. If using *Bottom Tabs*, add tab items in the Create App dialog. Each tab or menu item corresponds to a page flow; group Riley chat features on one tab (e.g. “Chat”) and settings or logs on another.
+* **Add a chat UI component:** To provide a conversation interface, use the Oracle Digital Assistant chat component available in the VB **Component Exchange**. Specifically, the `<oj-oda-chat>` web component can be dropped into a page. This ready-made chat widget supports message threading, attachment uploads, and **speech integration** for voice (see next step). After installing it (via **Component Exchange** in Settings), bind its events to your action chains to send user input to Riley’s backend.
+* **Include input controls:** On the same page, add an input field (e.g. an **Input Text** component) and send button for text commands. Bind the input’s value to a page variable (e.g. `userInput`). For example, configure the button’s **Click** event to invoke an action chain that calls Riley’s API with the `userInput` value. Use VB’s Properties pane to set placeholders, styling, etc.
+* **Support voice commands:** For voice/chat, add a “Record” button or icon. You can implement voice input via the HTML5 Web Speech API in a **JS Code** component, or leverage the `<oj-oda-chat>` component’s built-in speech feature. (When the user speaks, capture the transcript and send it as text to the backend.) Ensure any audio icons or indicators are large enough for mobile tap.
+* **Use adaptive layouts:** Group chat and input in a vertically scrolling flex container so messages fill the area. For desktop, you may use side-by-side panels (e.g. chat on left, controls on right), collapsing to single-column on mobile. Test resizing the Preview to confirm elements wrap appropriately. Use Oracle JET’s responsive grid classes (`oj-col-md-#`, etc.) to fine-tune breakpoints.
+
+## 3. Connect to Riley’s Backend with REST Services
+
+* **Define Backends and Service Connections:** In VB Studio, open the **Settings** → **Service Connections**. Click **+** to add a new Backend for Riley’s Flask API (e.g. base URL `https://<your-flask-host>/`). Then create a Service Connection for each API endpoint: you can import an OpenAPI/Swagger spec or use “Define by Endpoint” to specify the REST URL (e.g. `/api/chat`). Repeat for any OpenAI endpoints (e.g. `https://api.openai.com/v1/completions`). Note that backends/service connections require HTTPS with valid certs.
+* **Configure authentication:** If Riley’s Flask or OpenAI APIs need an API key or token, set that in the Backend’s **Security** tab (e.g. include headers like `Authorization: Bearer <token>`). Use **Manage Backends** if multiple apps will reuse the same connection.
+* **Use Service Connection in pages:** On your chat page, bind actions to the service. For example, when user sends a message, use a **Call Service** action to invoke the Riley service connection endpoint. Map the request payload (e.g. `{ "message": #{userInput} }`) and capture the JSON response. Then update the chat UI’s message list with Riley’s reply text. You may also chain a call to OpenAI (if Riley delegates to OpenAI) similarly. For details, see Oracle’s docs on adding a service connection and binding it to page components.
+* **Test the connection:** Use VB’s **Test** feature in the Service Connection wizard to verify connectivity. In the app, simulate calls using sample data to ensure responses are received and bound correctly.
+
+## 4. Define Business Objects for Data Storage (Optional)
+
+* **When to use Business Objects:** If Riley needs to store conversation logs, user profiles, or other structured data, create a **Business Object (BO)** in VB. A BO is like a database table with REST CRUD endpoints. For example, add a “Messages” BO with fields (e.g. `messageId`, `timestamp`, `sender`, `content`).
+* **Create a Business Object:** In the Visual Application, switch to the **Business Objects** tab and click **Create Business Object**. Enter a label (e.g. “Message”) and click Create. VB generates an object with default REST endpoints (list, get, create, update, delete). In the BO editor, use the **Fields** tab to add or adjust fields as needed.
+* **Use BO endpoints:** Back in your page, you can call these BO endpoints as a local data source. For instance, after receiving a chat message, invoke the BO’s **create** endpoint (POST) to save it. Later you can display history by querying the BO. VB automatically exposes the REST endpoints for your BO.
+* **Define relationships (if needed):** If you have multiple BOs (e.g. Users and Messages), use the BO **Relationships** feature to set up one-to-many relations (e.g. one User has many Messages). This also creates reference fields and nested endpoints for querying related data.
+
+## 5. Enable Progressive Web App (PWA) Features
+
+* **Enable PWA in App Settings:** In the Designer, click the app name in the left pane and then **Settings**. Go to the **PWA** tab. Click **Enable Progressive Web App (PWA)**. This adds the necessary manifest file, icons, and offline support scaffolding.
+* **Configure manifest:** In the PWA settings, set the **Application Name** and **Short Name** (these appear on install dialogs). Upload your app’s icon and splash screen (VB provides default Redwood-themed ones). For Android 8.0+, you can supply adaptive icons (different shapes).
+* **Add an offline fallback page:** VB lets you specify a custom **offline fallback** page that displays when the device is offline and a request fails. Create a simple page (e.g. “No connection. Please try again later.”) and configure it as the fallback.
+* **PWA behavior:** Once enabled, VB generates a **manifest.json** and registers a Service Worker. Users can **install** the app on their device via a QR code or browser install banner. The app will run in a separate, app-like window without a URL bar and can work offline (if your app data is cached). VB’s offline support takes care of static resources; your REST data can be made available offline using the Offline Persistent Toolkit (OPT) or HTTP caching.
+* **QR code and install:** In Stage or Live mode, users see an “Install App” banner or can scan a QR code to add Riley to their home screen. No need to build separate APK/APK files.
+
+## 6. Optimize for Performance and UX
+
+* **Enable VB Optimization:** Before staging/publishing, turn on VB’s built-in optimization. In **App Settings** under **General**, check **Optimize application when staging and publishing**. VB will minify CSS/images and bundle JS modules via RequireJS to reduce load time. You can further tweak the `build.json` to include/exclude resources.
+* **UI best practices:** Use Oracle JET’s lightweight controls and avoid deep nested layouts. For example, prefer **ListView** (virtualized list) over heavy **Grid** when displaying messages. Minimize the number of layers and unnecessary images in your pages. Use the default Redwood theme for consistency and mobile-friendly fonts. Provide clear labels and large tappable targets (buttons should be at least 44x44px).
+* **Data loading:** Fetch data lazily. For instance, load only recent chat messages or use “infinite scroll” on long histories. Cache static reference data when possible. Oracle recommends using cached data sources or bulk queries for large data. Compress and paginate results from your Flask backend to reduce payload size.
+* **Asset optimization:** Use small, web-optimized images (e.g. icons in SVG or compressed PNG). Avoid loading large logos or attachments unless needed. Use web-safe or Google Fonts sparingly. Enable **lazy loading** of images (Modern browsers support `loading="lazy"` on `<img>`).
+* **Feedback and responsiveness:** Show progress spinners or disabled states during long calls (VB’s Spinner component can be bound to a “loading” variable). This keeps the UX smooth. Test the app on various devices/browsers to ensure touch interactions and scrolling feel natural.
+* **Security & UX:** Always use HTTPS. Inform users when Riley is thinking (e.g. show “Riley is typing…”). Keep UI text concise and responsive to ensure fast rendering.
+
+## 7. Stage, Test, and Publish the App
+
+* **Stage the application:** From the Visual Builder **Home** page, open the Options menu for your app and select **Stage**. In the dialog, choose a database option: you can “populate stage with development data” to copy your dev BO records to staging. Confirm to deploy your latest version to the Stage environment.
+  &#x20;*Figure: In the Stage dialog, select to copy dev data to the Stage environment.*
+  Once staged, click the **Stage** link (or reopen the app and select the Stage icon) to launch the staged version in a new tab. Note the staging URL and share it with testers. The staging version lets team members try Riley’s chat and features without affecting the live app.
+* **Test thoroughly:** In the staged app, test all flows on desktop and mobile. Verify chat, voice recognition, and command processing work correctly. Ensure the layout adapts to screen rotations (portrait vs. landscape). Test PWA installation on a device – you should see an “Add to Home Screen” prompt or be able to scan the QR code to install. Also test offline behavior by toggling network off (the offline fallback page should appear for unsatisfied requests). Address any bugs or UI tweaks found.
+* **Publish the application:** When ready, return to the **Home** page and select **Publish** from the app’s menu. In the Publish dialog, choose whether to include staging data (usually “Include data from Stage” to copy test data) or start fresh. Click **Publish**. This promotes the staged version to live. The live URI remains the same, so users can bookmark it.
+  &#x20;*Figure: In the Publish dialog, choose to include data from Stage (copy schema/data to Live).*
+  After publishing, the app’s status shows **Live**. You can open the live app (via Home page > Options > Open) and verify everything still works. Note the live URL – this is what your end-users (or other systems) will use to interact with Riley. Remember that once published, the current live version is locked; future changes require staging a new version first.
+* **Database considerations:** On first stage/publish, VB asks how to handle data. You can copy dev→stage or stage→live, or use clean DBs. Decide based on your needs: e.g., if you loaded initial BO records for testing, copy them. Otherwise, start with a clean database on live.
+
+## References
+
+* **Oracle Visual Builder Documentation:** For details on creating apps, UI components, and data, see the official VB help: e.g. *Add Web Apps to Visual Application*, *Service Connections*, *Create and Edit Business Objects*, *Enable PWA*, and *Stage and Publish*.
+* **Component Exchange:** The `<oj-oda-chat>` chat widget is available via VB’s Component Exchange and provides advanced features like speech and theming. You can also find other JET components on the Oracle JET Cookbook for custom controls.
+* **Performance Tips:** See Oracle’s *Optimize Your Application* guide on enabling build-time optimization. Community blogs (e.g. IQStream) recommend using efficient controls, lazy loading, and minimizing assets. Follow responsive design best practices (flex layouts, touch-friendly UIs) for a smooth UX.
+* **UX Best Practices:** Use the default Redwood theme and consistent styling. Provide clear feedback (loading spinners, disable buttons on click). Test on real devices to ensure the app feels native. Aim for minimal clicks: e.g., auto-send on Enter key for chat, quick replies, etc.
+
+By following these steps—creating a responsive VB app, adding chat/voice UIs, connecting REST services, enabling PWA, and carefully staging/publishing—you’ll deliver a high-quality web frontend for the Riley AI agent, optimized for both desktop and mobile users.

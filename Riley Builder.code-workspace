@@ -1,0 +1,43 @@
+{
+    "folders": [
+        {
+            "path": "./builder",
+            "name": "Riley Builder"
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "**/.git": true,
+            "**/.DS_Store": true,
+            "**/node_modules": true,
+            "**/dist": true
+        },
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true,
+        "javascript.suggestionActions.enabled": false,
+        "javascript.validate.enable": false,
+        "javascript.format.enable": false
+    },
+    "extensions": {
+        "recommendations": [
+            "esbenp.prettier-vscode",
+            "dbaeumer.vscode-eslint",
+            "oracle.oraclejet",
+            "ms-vscode.vscode-typescript-tslint-plugin",
+            "vscode-icons-team.vscode-icons"
+        ]
+    },
+    "launch": {
+        "configurations": [
+            {
+                "type": "chrome",
+                "request": "launch",
+                "name": "Launch Builder in Chrome",
+                "url": "http://localhost:8080",
+                "webRoot": "${workspaceFolder}"
+            }
+        ]
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "name": "riley-builder",
+    "version": "1.0.0",
+    "description": "Visual Builder for Riley AI",
+    "main": "index.js",
+    "scripts": {
+        "start": "http-server -c-1",
+        "dev": "tsc -w",
+        "build": "tsc && npm run copy-assets",
+        "copy-assets": "powershell -File scripts/copy-assets.ps1",
+        "lint": "eslint src/**/*.{js,ts}",
+        "format": "prettier --write .",
+        "test": "jest",
+        "prepare": "node scripts/prepare.js"
+    },
+    "dependencies": {
+        "@oracle/oraclejet": "^15.1.0",
+        "@oracle/oraclejet-core-pack": "^15.1.0",
+        "knockout": "^3.5.1",
+        "requirejs": "^2.3.6",
+        "monaco-editor": "^0.40.0",
+        "@types/knockout": "^3.4.72",
+        "lodash": "^4.17.21"
+    },
+    "devDependencies": {
+        "typescript": "^4.9.5",
+        "eslint": "^8.42.0",
+        "prettier": "^2.8.8",
+        "http-server": "^14.1.1",
+        "@types/node": "^18.16.0",
+        "@types/lodash": "^4.14.195",
+        "jest": "^29.5.0",
+        "@types/jest": "^29.5.0",
+        "ts-jest": "^29.1.0"
+    }
+}

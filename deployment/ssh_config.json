@@ -1,0 +1,13 @@
+{
+    "ssh": {
+        "private_key_path": "${env:USERPROFILE}\\.ssh\\oracle_cloud\\oracle_cloud_key",
+        "public_key_path": "${env:USERPROFILE}\\.ssh\\oracle_cloud\\oracle_cloud_key.pub",
+        "user": "andrewtoka"
+    },
+    "oci": {
+        "region": "us-ashburn-1",
+        "tenancy_ocid": "ocid1.tenancy.oc1..aaaaaaaaiutl4m2magmp3omxuu5ih7p4zyi3cyyhchtfpcakcizqrhchlxhq",
+        "vbs_instance_ocid": "ocid1.vbsinstance.oc1.iad.amaaaaaai363nmaahjdzv3aytu5jkju5tgmxireclpmzx4ubgl27umurb7ca",
+        "compartment_ocid": "ocid1.tenancy.oc1..aaaaaaaaiutl4m2magmp3omxuu5ih7p4zyi3cyyhchtfpcakcizqrhchlxhq"
+    }
+}

@@ -1,0 +1,6 @@
+[client]
+host=143.47.108.112
+port=3306
+user=opc
+ssl-key="C:\\Users\\User\\.ssh\\oracle_cloud\\oracle_cloud_key"
+ssl-cert="C:\\Users\\User\\.ssh\\oracle_cloud\\oracle_cloud_key.pub"

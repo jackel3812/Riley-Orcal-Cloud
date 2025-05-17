@@ -1,0 +1,35 @@
+{
+    "mysql": {
+        "host": "127.0.0.1",
+        "port": 9001,
+        "database": "riley_db",
+        "user": "opc",
+        "auth": {
+            "type": "ssh",
+            "privateKey": "${env:USERPROFILE}\\.ssh\\oracle_cloud\\oracle_cloud_key",
+            "publicKey": "${env:USERPROFILE}\\.ssh\\oracle_cloud\\oracle_cloud_key.pub"
+        },
+        "vcn": {
+            "ocid": "ocid1.vcn.oc1.iad.amaaaaaai363nmaat374jterqg2rw2uqousqymy4qeg74l2xm3hswueb7azq",
+            "cidr": "10.0.0.0/16"
+        },
+        "pool": {
+            "min": 5,
+            "max": 10,
+            "idleTimeoutMillis": 30000
+        },
+        "ssl": {
+            "enabled": true,
+            "rejectUnauthorized": false
+        }
+    },
+    "backupConfig": {
+        "enabled": true,
+        "schedule": "0 0 * * *",
+        "backupPath": "./backups",
+        "retention": {
+            "days": 7,
+            "copies": 3
+        }
+    }
+}

@@ -1,0 +1,87 @@
+/* Builder-specific styles */
+
+/* Node types */
+.node-action {
+    background: linear-gradient(135deg, #4a90e2, #357abd);
+    color: white;
+}
+
+.node-condition {
+    background: linear-gradient(135deg, #50e3c2, #3cc4a4);
+    color: white;
+}
+
+.node-trigger {
+    background: linear-gradient(135deg, #ffbe0b, #e6ac0a);
+    color: white;
+}
+
+/* Connection styles */
+.connection-default {
+    stroke: #4a90e2;
+    stroke-width: 2px;
+}
+
+.connection-conditional {
+    stroke: #50e3c2;
+    stroke-width: 2px;
+    stroke-dasharray: 5, 5;
+}
+
+/* Canvas grid */
+.builder-canvas {
+    background-image: 
+        linear-gradient(to right, #f0f0f0 1px, transparent 1px),
+        linear-gradient(to bottom, #f0f0f0 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Properties panel */
+.property-group {
+    padding: 1rem;
+    border-bottom: 1px solid var(--oj-border-color);
+}
+
+.property-group:last-child {
+    border-bottom: none;
+}
+
+.property-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Toolbar button groups */
+.builder-toolbar oj-button-set {
+    margin-right: 1rem;
+}
+
+.builder-toolbar oj-button-set:last-child {
+    margin-right: 0;
+}
+
+/* Node selection */
+.node-selected {
+    box-shadow: 0 0 0 2px var(--oj-core-focus-border-color);
+}
+
+/* Zoom controls */
+.zoom-controls {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0.5rem;
+}
+
+/* Tree view customization */
+.builder-nav oj-tree-view {
+    padding: 1rem;
+}
+
+.tree-item-icon {
+    margin-right: 0.5rem;
+    color: var(--oj-core-text-color-secondary);
+}

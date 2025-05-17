@@ -1,0 +1,160 @@
+{    "riley": {
+        "connection": {
+            "url": "${RILEY_API_URL}",
+            "version": "2.0.0",
+            "auth": {
+                "type": "oauth2",
+                "clientId": "${RILEY_CLIENT_ID}",
+                "clientSecret": "${RILEY_CLIENT_SECRET}",
+                "scope": "full_access",
+                "ociConfig": {
+                    "tenancy": "${OCI_TENANCY}",
+                    "region": "${OCI_REGION}",
+                    "compartment": "${OCI_COMPARTMENT}"
+                }
+            }
+        },
+        "core": {
+            "framework": "fastapi",
+            "modelPath": "./models",
+            "database": {
+                "type": "sqlite",
+                "path": "./data/riley.db",
+                "backup": {
+                    "enabled": true,
+                    "interval": 86400
+                }
+            },
+            "llm": {
+                "model": "riley-llm",
+                "type": "ggml",
+                "path": "./models/llm",
+                "contextSize": 8192,
+                "threads": 4
+            },
+            "memorySystem": {
+                "enabled": true,
+                "persistence": true,
+                "type": "sqlite",
+                "path": "./data/memory.db",
+                "contextWindow": 10000,
+                "indexPath": "./data/memory_index"
+            },
+            "ethics": {
+                "enabled": true,
+                "rulesPath": "./config/ethics_rules.json",
+                "biasDetection": {
+                    "enabled": true,
+                    "modelPath": "./models/bias"
+                }
+            }
+        },
+        "features": {
+            "mathematics": {
+                "enginePath": "/riley/mathematics",
+                "syncMode": "realtime"
+            },
+            "physics": {
+                "enginePath": "/riley/physics",
+                "syncMode": "realtime"
+            },
+            "invention": {
+                "enginePath": "/riley/invention",
+                "syncMode": "async"
+            },
+            "voice": {
+                "synthesis": {
+                    "engine": "tacotron2",
+                    "model": "./models/voice/tacotron2",
+                    "vocoder": {
+                        "type": "hifi-gan",
+                        "model": "./models/voice/hifi-gan"
+                    },
+                    "cache": "./data/voice_cache"
+                },
+                "recognition": {
+                    "engine": "whisper",
+                    "model": "./models/voice/whisper",
+                    "language": "en"
+                }
+            },
+            "brainSwitch": {
+                "enginePath": "/riley/brain",
+                "modes": ["scientific", "creative", "analytical", "ethical"],
+                "personalities": {
+                    "default": {
+                        "model": "./models/personality/default",
+                        "config": "./config/personality/default.json"
+                    },
+                    "scientific": {
+                        "model": "./models/personality/scientific",
+                        "config": "./config/personality/scientific.json"
+                    },
+                    "creative": {
+                        "traits": ["innovative", "imaginative", "artistic"],
+                        "style": "expressive"
+                    },
+                    "ethical": {
+                        "traits": ["responsible", "fair", "transparent"],
+                        "style": "considerate"
+                    }
+                }
+            },
+            "mhdg": {
+                "enabled": true,
+                "model": "./models/mhdg/core",
+                "dataPath": "./data/mhdg"
+            },
+            "automation": {
+                "enginePath": "/riley/automation",
+                "scheduling": true,
+                "taskManagement": true,
+                "systemMonitoring": true
+            }
+        },
+        "sync": {
+            "interval": 5000,
+            "retryAttempts": 3,
+            "timeout": 30000,
+            "realtime": {
+                "enabled": true,
+                "websocket": true,
+                "pushNotifications": true
+            }
+        },
+        "deployment": {
+            "oci": {
+                "compute": {
+                    "shape": "VM.Standard.E4.Flex",
+                    "ocpus": 4,
+                    "memoryInGBs": 16
+                },
+                "storage": {
+                    "bootVolumeSizeInGBs": 100,
+                    "blockVolumes": [
+                        {
+                            "displayName": "RileyData",
+                            "sizeInGBs": 500,
+                            "vpusPerGB": 20
+                        }
+                    ]
+                },
+                "network": {
+                    "subnet": "${OCI_SUBNET}",
+                    "securityLists": ["${OCI_SECURITY_LIST}"],
+                    "loadBalancer": {
+                        "shape": "flexible",
+                        "minimumBandwidth": 10,
+                        "maximumBandwidth": 100
+                    }
+                }
+            },
+            "scaling": {
+                "enabled": true,
+                "min": 2,
+                "max": 10,
+                "targetCPUUtilization": 70
+            }
+        }
+    }
+}

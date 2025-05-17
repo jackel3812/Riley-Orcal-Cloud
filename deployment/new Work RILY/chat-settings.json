@@ -1,0 +1,136 @@
+{
+    "chat": {
+        "botName": "Riley",
+        "botIcon": "images/riley-avatar.png",
+        "userIcon": "images/user-avatar.png",
+        "welcomeMessage": "Hi! I'm Riley, your AI assistant. How can I help you today?",
+        "inputPlaceholder": "Type your message or click the microphone to speak",
+        "theme": {
+            "header": {
+                "backgroundColor": "#4a90e2",
+                "textColor": "#ffffff"
+            },
+            "messages": {
+                "bot": {
+                    "backgroundColor": "#f0f7ff",
+                    "textColor": "#333333"
+                },
+                "user": {
+                    "backgroundColor": "#4a90e2",
+                    "textColor": "#ffffff"
+                }
+            },
+            "input": {
+                "backgroundColor": "#ffffff",
+                "textColor": "#333333",
+                "placeholderColor": "#999999"
+            }
+        },        "features": {
+            "voice": {
+                "enabled": true,
+                "language": "en-US",
+                "continuous": false,
+                "interimResults": true,
+                "maxDuration": 60000,
+                "synthesis": {
+                    "engine": "tacotron2",
+                    "vocoder": "hifi-gan",
+                    "quality": "high",
+                    "emotionControl": true,
+                    "speedControl": true
+                },
+                "serverEndpoint": "${RILEY_VOICE_URL}/api/voice"
+            },
+            "serverFeatures": {
+                "enabled": true,
+                "baseUrl": "${RILEY_FEATURES_URL}/api",
+                "timeout": 30000,
+                "features": {
+                    "mathematics": {
+                        "enabled": true,
+                        "endpoint": "/mathematics"
+                    },
+                    "physics": {
+                        "enabled": true,
+                        "endpoint": "/physics"
+                    },
+                    "invention": {
+                        "enabled": true,
+                        "endpoint": "/invention"
+                    },
+                    "science": {
+                        "enabled": true,
+                        "endpoint": "/science"
+                    }
+                }
+            },
+            "brainSwitching": {
+                "enabled": true,
+                "availableBrains": [
+                    "default",
+                    "scientific",
+                    "creative",
+                    "analytical"
+                ],
+                "personalities": [
+                    "friendly",
+                    "professional",
+                    "playful",
+                    "scientific"
+                ],
+                "commandPrefix": "!"
+            },
+            "scientificFeatures": {
+                "enabled": true,
+                "mhdgTheory": true,
+                "inventionGeneration": true,
+                "theoreticalAnalysis": true
+            },
+            "memory": {
+                "enabled": true,
+                "persistence": true,
+                "contextualRecall": true,
+                "learningEnabled": true,
+                "maxMemorySize": 1073741824
+            },
+            "attachments": {
+                "enabled": true,
+                "maxSize": 5242880,
+                "allowedTypes": [
+                    "image/*",
+                    "audio/*",
+                    "application/pdf",
+                    "text/plain"
+                ],
+                "scanForViruses": true
+            },
+            "typing": {
+                "enabled": true,
+                "indicator": true
+            },
+            "offline": {
+                "enabled": true,
+                "syncInterval": 30000,
+                "maxStorageSize": 10485760,
+                "cacheStrategy": "network-first"
+            },
+            "accessibility": {
+                "screenReader": true,
+                "highContrast": false,
+                "textSize": "medium",
+                "keyboardNavigation": true
+            },
+            "localization": {
+                "defaultLanguage": "en",
+                "supportedLanguages": ["en", "es", "fr"],
+                "autoDetect": true
+            }
+        },
+        "notifications": {
+            "enabled": true,
+            "sound": true,
+            "desktop": true,
+            "mobile": true
+        }
+    }
+}

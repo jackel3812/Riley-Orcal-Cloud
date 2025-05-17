@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Builder in Chrome",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}",
+            "sourceMapPathOverrides": {
+                "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+                "webpack:///./*": "${workspaceFolder}/*"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run Build Script",
+            "program": "${workspaceFolder}/builder/scripts/build.js",
+            "cwd": "${workspaceFolder}",
+            "outputCapture": "std"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Full Stack Debug",
+            "configurations": ["Launch Builder in Chrome", "Run Build Script"]
+        }
+    ]
+}
