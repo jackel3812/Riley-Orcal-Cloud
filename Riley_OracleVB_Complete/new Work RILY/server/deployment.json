@@ -1,0 +1,85 @@
+{
+    "kind": "Deployment",
+    "spec": {
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "riley-features"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "name": "riley-features",
+                        "image": "${RILEY_FEATURES_IMAGE}",
+                        "resources": {
+                            "requests": {
+                                "memory": "1Gi",
+                                "cpu": "500m"
+                            },
+                            "limits": {
+                                "memory": "4Gi",
+                                "cpu": "2000m"
+                            }
+                        },
+                        "env": [
+                            {
+                                "name": "PYTHONPATH",
+                                "value": "/opt/app"
+                            },
+                            {
+                                "name": "TF_ENABLE_AUTO_MIXED_PRECISION",
+                                "value": "1"
+                            }
+                        ],
+                        "volumeMounts": [
+                            {
+                                "name": "model-storage",
+                                "mountPath": "/opt/app/models"
+                            },
+                            {
+                                "name": "config-volume",
+                                "mountPath": "/opt/app/config"
+                            }
+                        ],
+                        "ports": [
+                            {
+                                "containerPort": 8080
+                            }
+                        ],
+                        "readinessProbe": {
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8080
+                            },
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 10
+                        },
+                        "livenessProbe": {
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8080
+                            },
+                            "initialDelaySeconds": 60,
+                            "periodSeconds": 15
+                        }
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "model-storage",
+                        "persistentVolumeClaim": {
+                            "claimName": "riley-models-pvc"
+                        }
+                    },
+                    {
+                        "name": "config-volume",
+                        "configMap": {
+                            "name": "riley-config"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

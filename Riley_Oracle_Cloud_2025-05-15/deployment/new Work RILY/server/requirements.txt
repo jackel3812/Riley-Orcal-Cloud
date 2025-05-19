@@ -1,0 +1,28 @@
+# Server dependencies
+fastapi==0.68.0
+uvicorn==0.15.0
+python-multipart==0.0.5
+aiohttp==3.8.1
+pydantic==1.8.2
+
+# Feature dependencies
+numpy==1.21.2
+scipy==1.7.1
+sympy==1.8
+tensorflow==2.6.0
+transformers==4.9.2
+torch==1.9.0
+torchaudio==0.9.0
+tacotron2-pytorch==0.2.0
+hifi-gan==0.1.0
+
+# Utility dependencies
+python-jose==3.3.0
+cryptography==3.4.7
+aiofiles==0.7.0
+python-dateutil==2.8.2
+pytz==2021.1
+
+# Oracle Cloud SDK
+oci==2.45.1
+oci-cli==3.0.0

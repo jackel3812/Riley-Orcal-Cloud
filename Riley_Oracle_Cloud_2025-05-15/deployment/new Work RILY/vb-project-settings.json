@@ -1,0 +1,169 @@
+{
+    "application": {
+        "name": "Riley AI Assistant",
+        "version": "1.0.0",
+        "type": "web",
+        "defaultPage": "index",
+        "navigation": "none",
+        "theme": "Redwood"
+    },
+    "pages": [
+        {
+            "id": "index",
+            "name": "Chat with Riley",
+            "type": "page",
+            "flows": [
+                {
+                    "action": "chat",
+                    "description": "Send message to Riley",
+                    "parameters": [
+                        {
+                            "name": "message",
+                            "type": "string",
+                            "required": true
+                        }
+                    ],
+                    "endpoint": "/chat"
+                },
+                {
+                    "action": "voice",
+                    "description": "Process voice input",
+                    "parameters": [
+                        {
+                            "name": "audio",
+                            "type": "blob",
+                            "required": true
+                        }
+                    ],
+                    "endpoint": "/voice"
+                }
+            ]
+        }
+    ],
+    "businessObjects": [
+        {
+            "name": "Conversation",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "timestamp",
+                    "type": "datetime",
+                    "required": true
+                },
+                {
+                    "name": "message",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "sender",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "values": ["text", "voice"]
+                }
+            ],
+            "endpoints": {
+                "get": "/conversations/{id}",
+                "list": "/conversations",
+                "create": "/conversations",
+                "update": "/conversations/{id}",
+                "delete": "/conversations/{id}"
+            }
+        }
+    ],    "serviceConnections": [
+        {
+            "name": "RileyAPI",
+            "type": "REST",
+            "url": "https://api.oraclecloud.com/riley",
+            "authentication": {
+                "type": "oauth2",
+                "grantType": "client_credentials",
+                "scope": "chat voice brain_switch memory scientific"
+            },
+            "endpoints": {
+                "chat": "/chat",
+                "voice": "/voice",
+                "brainSwitch": "/brain/switch",
+                "memory": "/memory",
+                "scientific": "/scientific",
+                "mhdg": "/scientific/mhdg",
+                "invention": "/scientific/invention",
+                "personality": "/personality"
+            }
+        },
+        {
+            "name": "RileyFeatures",
+            "type": "REST",
+            "url": "${RILEY_FEATURES_URL}",
+            "authentication": {
+                "type": "oauth2",
+                "grantType": "client_credentials",
+                "scope": "mathematics physics science invention self_improvement"
+            },
+            "endpoints": {
+                "mathematics": "/api/mathematics",
+                "physics": "/api/physics",
+                "science": "/api/science",
+                "invention": "/api/invention",
+                "selfImprovement": "/api/self-improvement"
+            }
+        },
+        {
+            "name": "RileyVoice",
+            "type": "REST",
+            "url": "${RILEY_VOICE_URL}",
+            "authentication": {
+                "type": "oauth2",
+                "grantType": "client_credentials",
+                "scope": "voice_synthesis voice_recognition"
+            },
+            "endpoints": {
+                "synthesize": "/api/voice/synthesize",
+                "recognize": "/api/voice/recognize",
+                "train": "/api/voice/train"
+            }
+        }
+    ],
+    "security": {
+        "authentication": {
+            "type": "oauth2",
+            "provider": "oracle",
+            "clientId": "{{RILEY_CLIENT_ID}}",
+            "scope": "chat voice profile",
+            "responseType": "code",
+            "flows": ["authorization_code", "refresh_token"]
+        },
+        "authorization": {
+            "type": "role-based",
+            "roles": [
+                {
+                    "name": "user",
+                    "permissions": ["chat:read", "chat:write", "voice:use"]
+                },
+                {
+                    "name": "admin",
+                    "permissions": ["chat:read", "chat:write", "voice:use", "settings:manage", "users:manage"]
+                }
+            ]
+        },
+        "rateLimit": {
+            "enabled": true,
+            "maxRequests": 100,
+            "timeWindow": 60000
+        },
+        "cors": {
+            "enabled": true,
+            "origins": ["https://*.oraclecloud.com"],
+            "methods": ["GET", "POST"],
+            "allowCredentials": true
+        }
+    }
+}

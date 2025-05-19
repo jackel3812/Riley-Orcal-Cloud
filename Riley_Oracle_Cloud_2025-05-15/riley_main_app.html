@@ -1,0 +1,287 @@
+<!-- Riley AI Main Application Layout -->
+<div class="riley-app oj-web-applayout">
+    <!-- Header -->
+    <header role="banner" class="riley-header oj-web-applayout-header">
+        <div class="oj-flex">
+            <div class="oj-flex-item">
+                <h1 class="riley-title">Riley AI</h1>
+            </div>
+            <div class="oj-flex-item">
+                <oj-toolbar>
+                    <oj-menu-button id="userMenu" display="icons">
+                        <span slot="startIcon" class="oj-ux-ico-user"></span>
+                        <oj-menu slot="menu">
+                            <oj-option id="settings">Settings</oj-option>
+                            <oj-option id="help">Help</oj-option>
+                        </oj-menu>
+                    </oj-menu-button>
+                </oj-toolbar>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="oj-web-applayout-content">
+        <div class="oj-flex riley-main-container">
+            <!-- Sidebar -->
+            <div class="oj-flex-item oj-sm-12 oj-md-3 riley-sidebar">
+                <oj-navigation-list selection="chat" edge="start">
+                    <ul>
+                        <li id="chat">
+                            <a href="#">
+                                <span class="oj-ux-ico-chat"></span>
+                                Chat
+                            </a>
+                        </li>
+                        <li id="history">
+                            <a href="#">
+                                <span class="oj-ux-ico-clock"></span>
+                                History
+                            </a>
+                        </li>
+                        <li id="voice">
+                            <a href="#">
+                                <span class="oj-ux-ico-mic"></span>
+                                Voice Settings
+                            </a>
+                        </li>
+                    </ul>
+                </oj-navigation-list>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="oj-flex-item oj-sm-12 oj-md-9 riley-chat-area">
+                <div class="riley-chat-container">
+                    <!-- Messages Area -->
+                    <div class="riley-messages">
+                        <oj-oda-chat id="rileyChat"
+                            messages="[[chatMessages]]"
+                            on-message-sent="[[handleMessageSent]]"
+                            on-voice-recording="[[handleVoiceRecording]]"
+                            enable-voice="[[voiceEnabled]]"
+                            enable-attachments="true"
+                            show-timestamp="true"
+                            placeholder-text="Chat with Riley...">
+                        </oj-oda-chat>
+                    </div>
+
+                    <!-- Voice Controls -->
+                    <div class="riley-voice-controls">
+                        <oj-buttonset-one value="{{voiceEnabled}}">
+                            <oj-option value="true">Voice Enabled</oj-option>
+                            <oj-option value="false">Voice Disabled</oj-option>
+                        </oj-buttonset-one>
+                        
+                        <oj-button id="recordButton" 
+                            on-oj-action="[[startVoiceRecording]]"
+                            disabled="[[!voiceEnabled]]">
+                            <span slot="startIcon" class="oj-ux-ico-mic"></span>
+                            Start Recording
+                        </oj-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles -->
+<style>
+.riley-app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--oj-core-bg-color-content);
+}
+
+.riley-header {
+    background: var(--oj-core-bg-color-active);
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.riley-title {
+    margin: 0;
+    color: var(--oj-core-text-color-primary);
+    font-size: 1.5rem;
+}
+
+.riley-main-container {
+    height: calc(100vh - 64px); /* Subtract header height */
+    overflow: hidden;
+}
+
+.riley-sidebar {
+    background: var(--oj-core-bg-color-content);
+    border-right: 1px solid var(--oj-border-color);
+    padding: 1rem;
+}
+
+.riley-chat-area {
+    display: flex;
+    flex-direction: column;
+}
+
+.riley-chat-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.riley-messages {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--oj-core-bg-color-content);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.riley-voice-controls {
+    padding: 1rem;
+    background: var(--oj-core-bg-color-content);
+    border-top: 1px solid var(--oj-border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .riley-sidebar {
+        display: none;
+    }
+
+    .riley-chat-container {
+        padding: 0.5rem;
+    }
+
+    .riley-voice-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Custom Theme Overrides */
+:root {
+    --riley-primary: #4a90e2;
+    --riley-secondary: #2c3e50;
+    --riley-accent: #e74c3c;
+}
+
+/* Animation for chat messages */
+@keyframes messageIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.oj-oda-message {
+    animation: messageIn 0.3s ease-out;
+}
+</style>
+
+<!-- JavaScript Module -->
+<script>
+define(['ojs/ojcore', 'knockout', 'ojs/ojknockout', 'ojs/ojnavigationlist', 
+        'ojs/ojbutton', 'ojs/ojmenu', 'ojs/ojoda-chat'],
+function(oj, ko) {
+    function RileyChatViewModel() {
+        var self = this;
+
+        // Observables
+        self.chatMessages = ko.observableArray([]);
+        self.voiceEnabled = ko.observable(true);
+        
+        // Handle sent messages
+        self.handleMessageSent = function(event) {
+            var message = event.detail.message;
+            
+            // Add user message to chat
+            self.chatMessages.push({
+                type: 'sent',
+                content: message,
+                timestamp: new Date()
+            });
+
+            // Call Riley's API
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Add Riley's response to chat
+                self.chatMessages.push({
+                    type: 'received',
+                    content: data.response,
+                    timestamp: new Date()
+                });
+            });
+        };
+
+        // Handle voice recording
+        self.handleVoiceRecording = function(event) {
+            var audioBlob = event.detail.audio;
+            
+            // Create form data with audio
+            var formData = new FormData();
+            formData.append('audio', audioBlob);
+
+            // Send to Riley's voice API
+            fetch('/api/voice', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.transcript) {
+                    self.chatMessages.push({
+                        type: 'sent',
+                        content: data.transcript,
+                        timestamp: new Date()
+                    });
+                }
+                if (data.response) {
+                    self.chatMessages.push({
+                        type: 'received',
+                        content: data.response,
+                        timestamp: new Date()
+                    });
+                }
+            });
+        };
+
+        // Initialize
+        self.connected = function() {
+            // Load user preferences
+            fetch('/api/users/current')
+                .then(response => response.json())
+                .then(data => {
+                    self.voiceEnabled(data.voiceEnabled);
+                });
+
+            // Load chat history
+            fetch('/api/conversations')
+                .then(response => response.json())
+                .then(data => {
+                    self.chatMessages(data.map(msg => ({
+                        type: msg.sender === 'user' ? 'sent' : 'received',
+                        content: msg.content,
+                        timestamp: new Date(msg.timestamp)
+                    })));
+                });
+        };
+    }
+
+    return new RileyChatViewModel();
+});
+</script>

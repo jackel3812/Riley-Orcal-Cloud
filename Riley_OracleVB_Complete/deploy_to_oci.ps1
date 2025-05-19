@@ -17,9 +17,8 @@ function Create-DeploymentPackage {
     $tempDir = Join-Path $WorkspacePath "deployment\temp"
     New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
     
-    # Run the organization script to properly structure files
-    $organizerScript = Join-Path $WorkspacePath "deployment\organize_deployment.ps1"
-    & $organizerScript -sourceDir $WorkspacePath -deploymentRoot $tempDir
+    # Copy required files
+    Copy-Item -Path "$WorkspacePath\deployment\new Work RILY\*" -Destination $tempDir -Recurse -Force
     Copy-Item -Path "$WorkspacePath\deployment_config.json" -Destination $tempDir -Force
     Copy-Item -Path "$WorkspacePath\deployment\oci_config.json" -Destination $tempDir -Force
     

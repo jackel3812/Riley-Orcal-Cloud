@@ -1,0 +1,42 @@
+{
+    "backend": {
+        "base_url": "https://riley-flask-api:5000",
+        "endpoints": {
+            "chat": "/chat",
+            "voice": "/voice"
+        }
+    },
+    "business_objects": {
+        "conversation": {
+            "fields": [
+                {"name": "messageId", "type": "string"},
+                {"name": "timestamp", "type": "datetime"},
+                {"name": "sender", "type": "string"},
+                {"name": "content", "type": "string"},
+                {"name": "messageType", "type": "string"}
+            ]
+        },
+        "user_profile": {
+            "fields": [
+                {"name": "userId", "type": "string"},
+                {"name": "preferences", "type": "object"},
+                {"name": "lastInteraction", "type": "datetime"}
+            ]
+        }
+    },
+    "ui": {
+        "chat": {
+            "component": "oj-oda-chat",
+            "settings": {
+                "enableVoice": true,
+                "enableAttachments": true,
+                "showTypingIndicator": true
+            }
+        },
+        "theme": {
+            "primary": "#4a90e2",
+            "secondary": "#2c3e50",
+            "accent": "#e74c3c"
+        }
+    }
+}

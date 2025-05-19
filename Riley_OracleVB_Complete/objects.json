@@ -1,0 +1,83 @@
+{
+    "business_objects": {
+        "RileyConversation": {
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "string",
+                    "required": true,
+                    "primaryKey": true
+                },
+                {
+                    "name": "messageId",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "timestamp",
+                    "type": "datetime",
+                    "required": true,
+                    "defaultValue": "CURRENT_TIMESTAMP"
+                },
+                {
+                    "name": "sender",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "content",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "messageType",
+                    "type": "string",
+                    "values": ["text", "voice", "attachment"]
+                },
+                {
+                    "name": "attachmentUrl",
+                    "type": "string"
+                }
+            ],
+            "endpoints": {
+                "create": "/api/conversations",
+                "get": "/api/conversations/{id}",
+                "list": "/api/conversations",
+                "update": "/api/conversations/{id}",
+                "delete": "/api/conversations/{id}"
+            }
+        },
+        "RileyUserProfile": {
+            "fields": [
+                {
+                    "name": "userId",
+                    "type": "string",
+                    "required": true,
+                    "primaryKey": true
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "preferences",
+                    "type": "object"
+                },
+                {
+                    "name": "lastInteraction",
+                    "type": "datetime"
+                },
+                {
+                    "name": "voiceEnabled",
+                    "type": "boolean",
+                    "defaultValue": true
+                }
+            ],
+            "endpoints": {
+                "create": "/api/users",
+                "get": "/api/users/{userId}",
+                "update": "/api/users/{userId}"
+            }
+        }
+    }
+}

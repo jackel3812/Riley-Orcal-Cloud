@@ -1,0 +1,32 @@
+{
+    "riley_backend": {
+        "type": "flask",
+        "host": "0.0.0.0",
+        "port": 5000,
+        "ssl": true,
+        "cors_origins": ["*"],
+        "dependencies": [
+            "flask",
+            "flask-cors",
+            "numpy",
+            "tensorflow",
+            "nltk",
+            "flask-sqlalchemy",
+            "torch",
+            "torchaudio",
+            "transformers"
+        ],
+        "cloud_config": {
+            "instance_type": "VM.Standard.E4.Flex",
+            "ocpu_count": 4,
+            "memory_in_gbs": 16,
+            "boot_volume_size_in_gbs": 100
+        },
+        "env_vars": {
+            "FLASK_ENV": "production",
+            "DATABASE_URL": "sqlite:///riley_chat.db",
+            "ENABLE_LOCAL_LLM": "true",
+            "ENABLE_LOCAL_TTS": "true"
+        }
+    }
+}

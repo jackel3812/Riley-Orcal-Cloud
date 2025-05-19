@@ -1,0 +1,38 @@
+{
+    "service_connections": {
+        "riley_chat_api": {
+            "type": "REST",
+            "url": "https://riley-flask-api:5000",
+            "endpoints": [
+                {
+                    "name": "chat",
+                    "method": "POST",
+                    "path": "/chat",
+                    "request_payload": {
+                        "type": "application/json",
+                        "example": {
+                            "message": "Hello Riley"
+                        }
+                    },
+                    "response": {
+                        "type": "application/json",
+                        "example": {
+                            "response": "Hello! How can I help you today?"
+                        }
+                    }
+                },
+                {
+                    "name": "voice",
+                    "method": "POST",
+                    "path": "/voice",
+                    "request_payload": {
+                        "type": "multipart/form-data",
+                        "example": {
+                            "audio": "binary-data"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

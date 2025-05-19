@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4a90e2">
+    <title>Riley AI Assistant</title>
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/riley-192.png">
+    
+    <!-- Oracle JET CSS -->
+    <link rel="stylesheet" href="https://static.oracle.com/cdn/jet/15.1.0/default/css/redwood/oj-redwood-min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/glow-button.css">
+    <link rel="stylesheet" href="css/cyber-card.css">
+    <style>
+        .riley-chat-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .riley-header {
+            padding: 1rem;
+            background: var(--oj-core-bg-color-primary);
+            color: white;
+        }
+        
+        .riley-chat-area {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .riley-input-area {
+            padding: 1rem;
+            border-top: 1px solid var(--oj-border-color);
+        }
+        
+        @media (max-width: 768px) {
+            .riley-chat-area {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Enhanced UI Elements */
+        .riley-message {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .riley-message.user {
+            background: var(--oj-core-bg-color-primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .riley-message.bot {
+            background: var(--oj-core-bg-color-secondary);
+            margin-right: auto;
+        }
+
+        .riley-toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: var(--oj-core-bg-color-tertiary);
+        }
+
+        .riley-typing {
+            font-style: italic;
+            color: var(--oj-text-color-secondary);
+            padding: 4px 12px;
+        }
+
+        /* Offline Support */
+        .riley-offline-banner {
+            background: #ff4444;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            display: none;
+        }        
+        body.offline .riley-offline-banner {
+            display: block;
+        }
+
+        /* Brain Control Panel */
+        .riley-control-panel {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--oj-core-bg-color-tertiary);
+            border-bottom: 1px solid var(--oj-border-color);
+        }
+
+        .riley-control-panel oj-select-single {
+            min-width: 200px;
+        }
+
+        /* Scientific Mode */
+        .scientific-button.active {
+            background-color: var(--oj-core-success-color);
+            color: white;
+        }
+
+        /* Voice Button Enhancements */
+        .voice-button.recording {
+            background-color: var(--oj-core-danger-color);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Offline Indicator */
+        .riley-status {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 4px 8px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .riley-status.offline {
+            background: #ff4444;
+            color: white;
+        }
+
+        .riley-status.processing {
+            background: #4a90e2;
+            color: white;
+        }
+
+        /* Local Processing Indicator */
+        .riley-processing {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 20px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .riley-processing.active {
+            display: flex;
+        }
+
+        .riley-processing .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="riley-status">Ready - Local Mode</div>
+    
+    <div class="riley-chat-container">
+        <!-- Header -->
+        <header class="riley-header">
+            <oj-navigation-bar>
+                <h1 slot="start">Riley AI</h1>
+                <div slot="end">
+                    <span id="modelStatus">Model: Loaded</span>
+                    <oj-button id="settingsButton">
+                        <span slot="startIcon" class="oj-ux-ico-settings"></span>
+                        Settings
+                    </oj-button>
+                </div>
+            </oj-navigation-bar>
+        </header>
+
+        <!-- Chat Area -->
+        <main class="riley-chat-area">
+            <div id="messages" class="messages"></div>
+            <!-- Include Cyber Card -->
+            <div class="cyber-card-wrapper">
+                <include src="components/cyber-card.html"></include>
+            </div>
+        </main>
+
+        <!-- Brain Control Panel -->
+        <div class="riley-control-panel">
+            <oj-select-single id="brainSelector"
+                value="{{currentBrain}}"
+                data="[[availableBrains]]"
+                label-hint="Brain Mode">
+            </oj-select-single>
+            <oj-select-single id="personalitySelector"
+                value="{{currentPersonality}}"
+                data="[[availablePersonalities]]"
+                label-hint="Personality">
+            </oj-select-single>
+            <oj-button id="scientificModeButton"
+                on-oj-action="[[toggleScientificMode]]"
+                class="{{scientificMode() ? 'active' : ''}}">
+                <span slot="startIcon" class="oj-ux-ico-education"></span>
+                Scientific Mode
+            </oj-button>
+        </div>
+
+        <!-- Input Area -->
+        <footer class="riley-input-area">
+            <oj-form-layout direction="row">
+                <oj-text-area id="userInput" 
+                    value="{{userMessage}}" 
+                    rows="1"
+                    resize="vertical"
+                    placeholder="Chat with Riley...">
+                </oj-text-area>            <button id="sendButton" 
+                class="button"
+                data-bind="click: sendMessage, disable: isProcessing">
+                Send
+            </button>
+                <oj-button id="voiceButton" 
+                    on-oj-action="[[toggleVoiceInput]]"
+                    class="voice-button {{isRecording() ? 'recording' : ''}}">
+                    <span slot="startIcon" class="oj-ux-ico-mic"></span>
+                </oj-button>
+                <oj-button id="scientificButton" 
+                    on-oj-action="[[startScientificAnalysis]]"
+                    class="scientific-button">
+                    <span slot="startIcon" class="oj-ux-ico-lab"></span>
+                </oj-button>
+            </oj-form-layout>
+        </footer>
+    </div>
+
+    <!-- Local Processing Indicator -->
+    <div class="riley-processing" data-bind="css: { active: isProcessing }">
+        <div class="spinner"></div>
+        <span data-bind="text: processingStatus"></span>
+    </div>
+
+    <!-- Load Local Models Worker -->
+    <script src="js/riley-worker.js" defer></script>
+    
+    <!-- Oracle JET Scripts -->
+    <script src="https://static.oracle.com/cdn/jet/15.1.0/default/js/libs/require/require.js"></script>
+    <script>
+        requirejs.config({
+            baseUrl: 'js',
+            paths: {
+                'knockout': 'https://static.oracle.com/cdn/jet/15.1.0/default/js/libs/knockout/knockout-3.5.1',
+                'jquery': 'https://static.oracle.com/cdn/jet/15.1.0/default/js/libs/jquery/jquery-3.6.0.min',
+                'ojs': 'https://static.oracle.com/cdn/jet/15.1.0/default/js/libs/oj/15.1.0/min'
+            }
+        });
+
+        require(['ojs/ojcore', 'knockout', 'ojs/ojknockout', 'ojs/ojbutton', 
+                'ojs/ojinputtext', 'ojs/ojnavigationbar', 'ojs/ojformlayout', 
+                'ojs/ojselectsingle', './js/riley-core.js'],
+        function(oj, ko, RileyCore) {
+            function RileyViewModel() {
+                var self = this;
+                
+                // Initialize Riley's local core
+                self.rileyCore = new RileyCore({
+                    modelsPath: './models',
+                    dataPath: './data',
+                    configPath: './config'
+                });
+
+                // Observables
+                self.isProcessing = ko.observable(false);
+                self.processingStatus = ko.observable('');
+                self.isRecording = ko.observable(false);
+                self.scientificMode = ko.observable(false);
+                
+                // Brain and Personality Management
+                self.availableBrains = ko.observableArray([
+                    { value: 'default', label: 'Default' },
+                    { value: 'scientific', label: 'Scientific' },
+                    { value: 'creative', label: 'Creative' },
+                    { value: 'analytical', label: 'Analytical' }
+                ]);
+                
+                self.availablePersonalities = ko.observableArray([
+                    { value: 'friendly', label: 'Friendly' },
+                    { value: 'professional', label: 'Professional' },
+                    { value: 'playful', label: 'Playful' },
+                    { value: 'scientific', label: 'Scientific' }
+                ]);
+                
+                self.currentBrain = ko.observable('default');
+                self.currentPersonality = ko.observable('friendly');
+
+                // Local Message Processing
+                self.sendMessage = async function() {
+                    if (!self.userMessage().trim() || self.isProcessing()) return;
+
+                    self.isProcessing(true);
+                    self.processingStatus('Processing message...');
+
+                    try {
+                        const response = await self.rileyCore.processMessage({
+                            text: self.userMessage(),
+                            brain: self.currentBrain(),
+                            personality: self.currentPersonality(),
+                            scientific: self.scientificMode()
+                        });
+
+                        self.addMessage({
+                            content: response.text,
+                            isUser: false,
+                            timestamp: new Date()
+                        });
+
+                        if (response.voice) {
+                            await self.rileyCore.synthesizeVoice(response.text);
+                        }
+
+                        self.userMessage('');
+                    } catch (error) {
+                        console.error('Processing error:', error);
+                        self.addMessage({
+                            content: "I apologize, but I encountered an error. Please try again.",
+                            isUser: false,
+                            timestamp: new Date()
+                        });
+                    } finally {
+                        self.isProcessing(false);
+                        self.processingStatus('');
+                    }
+                };
+
+                // Voice Input Handler
+                self.toggleVoiceInput = async function() {
+                    if (self.isRecording()) {
+                        self.isRecording(false);
+                        self.processingStatus('Processing voice input...');
+                        try {
+                            const text = await self.rileyCore.stopVoiceRecording();
+                            if (text) {
+                                self.userMessage(text);
+                                await self.sendMessage();
+                            }
+                        } catch (error) {
+                            console.error('Voice processing error:', error);
+                        }
+                    } else {
+                        try {
+                            await self.rileyCore.startVoiceRecording();
+                            self.isRecording(true);
+                        } catch (error) {
+                            console.error('Voice recording error:', error);
+                        }
+                    }
+                };
+
+                // Initialize
+                self.initialize = async function() {
+                    self.processingStatus('Loading AI models...');
+                    try {
+                        await self.rileyCore.initialize();
+                        document.querySelector('.riley-status').textContent = 'Ready - Local Mode';
+                    } catch (error) {
+                        console.error('Initialization error:', error);
+                        document.querySelector('.riley-status').textContent = 'Error - Check Console';
+                    }
+                    self.processingStatus('');
+                };
+
+                // Start initialization
+                self.initialize();
+            }
+
+            ko.applyBindings(new RileyViewModel());
+        });
+    </script>
+</body>
+</html>

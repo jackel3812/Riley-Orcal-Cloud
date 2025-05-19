@@ -1,0 +1,175 @@
+{    "workflows": {
+        "brainSwitch": {
+            "trigger": "brainSwitchCommand",
+            "actions": [
+                {
+                    "id": "switchBrain",
+                    "type": "serviceConnection",
+                    "connection": "RileyAPI",
+                    "endpoint": "/brain/switch",
+                    "method": "POST",
+                    "input": {
+                        "brainType": "{{ $page.variables.brainType }}",
+                        "personality": "{{ $page.variables.personality }}"
+                    }
+                }
+            ]
+        },
+        "scientificReasoning": {
+            "trigger": "scientificQuery",
+            "actions": [
+                {
+                    "id": "processMHDG",
+                    "type": "serviceConnection",
+                    "connection": "RileyAPI",
+                    "endpoint": "/scientific/mhdg",
+                    "method": "POST",
+                    "input": {
+                        "query": "{{ $page.variables.query }}",
+                        "context": "{{ $page.variables.context }}"
+                    }
+                },
+                {
+                    "id": "generateInvention",
+                    "type": "serviceConnection",
+                    "connection": "RileyAPI",
+                    "endpoint": "/scientific/invention",
+                    "method": "POST",
+                    "input": {
+                        "problem": "{{ $page.variables.problem }}",
+                        "constraints": "{{ $page.variables.constraints }}"
+                    }
+                }
+            ]
+        },
+        "memoryManagement": {
+            "trigger": "memoryOperation",
+            "actions": [
+                {
+                    "id": "processMemory",
+                    "type": "serviceConnection",
+                    "connection": "RileyAPI",
+                    "endpoint": "/memory",
+                    "method": "POST",
+                    "input": {
+                        "operation": "{{ $page.variables.operation }}",
+                        "data": "{{ $page.variables.memoryData }}"
+                    }
+                }
+            ]
+        },
+        "chat": {
+            "trigger": "userMessage",
+            "actions": [
+                {
+                    "id": "sendToRiley",
+                    "type": "serviceConnection",
+                    "connection": "RileyAPI",
+                    "endpoint": "/chat",
+                    "method": "POST",
+                    "input": {
+                        "message": "{{ $page.variables.userInput }}"
+                    },
+                    "output": {
+                        "response": "{{ $chain.results.body.response }}"
+                    }
+                },
+                {
+                    "id": "saveConversation",
+                    "type": "businessObject",
+                    "operation": "create",
+                    "object": "Conversation",
+                    "input": {
+                        "message": "{{ $page.variables.userInput }}",
+                        "response": "{{ $chain.sendToRiley.response }}",
+                        "timestamp": "{{ $function.now() }}",
+                        "type": "text"
+                    }
+                },
+                {
+                    "id": "updateUI",
+                    "type": "action",
+                    "module": "vb/action/builtin/callModuleFunctionAction",
+                    "input": {
+                        "module": "chat",
+                        "function": "addMessage",
+                        "params": [
+                            {
+                                "content": "{{ $chain.sendToRiley.response }}",
+                                "isUser": false,
+                                "timestamp": "{{ $function.now() }}"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "voice": {
+            "trigger": "voiceInput",
+            "actions": [
+                {
+                    "id": "processVoice",
+                    "type": "serviceConnection",
+                    "connection": "RileyAPI",
+                    "endpoint": "/voice",
+                    "method": "POST",
+                    "input": {
+                        "audio": "{{ $page.variables.audioBlob }}"
+                    }
+                }
+            ]
+        },
+        "attachmentHandling": {
+            "trigger": "fileUpload",
+            "actions": [
+                {
+                    "id": "processAttachment",
+                    "type": "serviceConnection",
+                    "connection": "RileyAPI",
+                    "endpoint": "/attachments",
+                    "method": "POST",
+                    "input": {
+                        "file": "{{ $chain.trigger.file }}",
+                        "type": "{{ $chain.trigger.fileType }}"
+                    }
+                }
+            ]
+        },
+        "offlineSync": {
+            "trigger": "online",
+            "actions": [
+                {
+                    "id": "syncPendingMessages",
+                    "type": "action",
+                    "module": "sync",
+                    "function": "processPendingMessages"
+                }
+            ]
+        },
+        "errorHandling": {
+            "trigger": "error",
+            "actions": [
+                {
+                    "id": "logError",
+                    "type": "businessObject",
+                    "operation": "create",
+                    "object": "ErrorLog",
+                    "input": {
+                        "error": "{{ $chain.trigger.error }}",
+                        "timestamp": "{{ $function.now() }}",
+                        "context": "{{ $chain.trigger.context }}"
+                    }
+                },
+                {
+                    "id": "notifyUser",
+                    "type": "ui",
+                    "action": "showMessage",
+                    "input": {
+                        "message": "An error occurred. Please try again.",
+                        "type": "error"
+                    }
+                }
+            ]
+        }
+    }
+}
